@@ -2,9 +2,11 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { google } from 'googleapis';
 import { TournamentDto } from './tournament-dto';
+import { getLogger } from 'log4js';
 
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
 
+const logger = getLogger('loadOpenTournaments')
 @Injectable()
 export class OpenTournamentsService {
   constructor(private configService: ConfigService) {}
@@ -18,7 +20,8 @@ export class OpenTournamentsService {
     });
 
     const client = await auth.getClient().catch((err) => {
-      const message = `Failed to authenticate to read BCDS spreadsheet: ${err}`;
+      const message = `Failed to authenticate to read Open Tournaments spreadsheet: ${err}`;
+      logger.info(message);
       throw new ForbiddenException(message);
     });
 
@@ -42,6 +45,7 @@ export class OpenTournamentsService {
         console.log(`Error: ${error}`);
       });
     if (!response) {
+      logger.info(`No tournaments found for year ${year}`);
       return [];
     }
 
@@ -78,6 +82,7 @@ export class OpenTournamentsService {
       }
       tournaments.push(t);
     }
+    logger.info(`${tournaments.length} tournaments found for year ${year}`);
     return tournaments;
   }
 }

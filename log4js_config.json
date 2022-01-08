@@ -1,0 +1,21 @@
+{
+  "appenders": {
+    "out": {
+      "type": "stdout"
+    },
+    "tc-rankings": {
+      "type": "file",
+      "filename": "log/tc-rankings.log",
+      "maxLogSize": 20000000
+    }
+  },
+  "categories": {
+    "default": {
+      "appenders": [
+        "out",
+        "tc-rankings"
+      ],
+      "level": "info"
+    }
+  }
+}
