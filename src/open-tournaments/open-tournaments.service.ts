@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { google } from 'googleapis';
 import { TournamentDto } from './tournament-dto';
@@ -6,7 +6,7 @@ import { getLogger } from 'log4js';
 
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
 
-const logger = getLogger('loadOpenTournaments')
+const logger = getLogger('loadOpenTournaments');
 @Injectable()
 export class OpenTournamentsService {
   constructor(private configService: ConfigService) {}
@@ -15,19 +15,13 @@ export class OpenTournamentsService {
   // It returns the spreadsheet manipulation API
   async authentication() {
     const auth = new google.auth.GoogleAuth({
-      keyFile: this.configService.get('GOOGLE_APPLICATION_CREDENTIALS'),
+      keyFilename: this.configService.get('GOOGLE_APPLICATION_CREDENTIALS'),
       scopes: SCOPES,
-    });
-
-    const client = await auth.getClient().catch((err) => {
-      const message = `Failed to authenticate to read Open Tournaments spreadsheet: ${err}`;
-      logger.info(message);
-      throw new ForbiddenException(message);
     });
 
     const sheets = google.sheets({
       version: 'v4',
-      auth: client,
+      auth,
     });
     return { sheets };
   }
